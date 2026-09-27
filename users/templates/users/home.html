@@ -1,0 +1,1177 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SkyWatch YOLO | AI Object Detection</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #020617;
+            color: white;
+            overflow-x: hidden;
+        }
+
+
+        /* ================= NAVBAR ================= */
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 75px;
+            padding: 0 7%;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(15px);
+
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+
+            z-index: 1000;
+        }
+
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .logo span {
+            color: white;
+        }
+
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+
+        .nav-links a:hover {
+            color: #38bdf8;
+        }
+
+
+        .nav-button {
+            background: #2563eb;
+            padding: 10px 20px;
+            border-radius: 7px;
+            color: white !important;
+        }
+
+
+        .nav-button:hover {
+            background: #1d4ed8;
+        }
+
+
+        /* ================= HERO ================= */
+
+        .hero {
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 130px 20px 80px;
+
+            position: relative;
+
+            background:
+                radial-gradient(circle at 20% 30%, rgba(37,99,235,0.25), transparent 30%),
+                radial-gradient(circle at 80% 70%, rgba(14,165,233,0.20), transparent 30%);
+        }
+
+
+        .grid-background {
+            position: absolute;
+            inset: 0;
+
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+
+            background-size: 50px 50px;
+
+            pointer-events: none;
+        }
+
+
+        .hero-content {
+            max-width: 950px;
+            position: relative;
+            z-index: 2;
+        }
+
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 8px 18px;
+
+            border: 1px solid rgba(56,189,248,0.3);
+
+            background: rgba(56,189,248,0.08);
+
+            border-radius: 30px;
+
+            color: #7dd3fc;
+
+            font-size: 14px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+
+            background: #22c55e;
+
+            border-radius: 50%;
+
+            box-shadow: 0 0 10px #22c55e;
+        }
+
+
+        .hero h1 {
+            font-size: clamp(45px, 7vw, 82px);
+
+            line-height: 1.05;
+
+            margin-bottom: 25px;
+        }
+
+
+        .hero h1 span {
+            color: #38bdf8;
+        }
+
+
+        .hero-description {
+            max-width: 750px;
+
+            margin: auto;
+
+            color: #94a3b8;
+
+            font-size: 19px;
+
+            line-height: 1.8;
+
+            margin-bottom: 35px;
+        }
+
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+
+            gap: 15px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .btn {
+            padding: 14px 28px;
+
+            border-radius: 8px;
+
+            text-decoration: none;
+
+            font-weight: bold;
+
+            transition: 0.3s;
+        }
+
+
+        .primary-btn {
+            background: #2563eb;
+            color: white;
+
+            box-shadow: 0 0 25px rgba(37,99,235,0.3);
+        }
+
+
+        .secondary-btn {
+            border: 1px solid #334155;
+            color: white;
+
+            background: rgba(255,255,255,0.03);
+        }
+
+
+        .btn:hover {
+            transform: translateY(-4px);
+        }
+
+
+        /* ================= STATS ================= */
+
+        .stats {
+            max-width: 1000px;
+
+            margin: -40px auto 80px;
+
+            display: grid;
+
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 15px;
+
+            padding: 0 20px;
+
+            position: relative;
+
+            z-index: 5;
+        }
+
+
+        .stat {
+            padding: 25px;
+
+            background: rgba(15,23,42,0.85);
+
+            border: 1px solid #1e293b;
+
+            border-radius: 12px;
+
+            text-align: center;
+
+            backdrop-filter: blur(10px);
+        }
+
+
+        .stat h2 {
+            color: #38bdf8;
+
+            font-size: 28px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .stat p {
+            color: #64748b;
+
+            font-size: 13px;
+        }
+
+
+        /* ================= COMMON ================= */
+
+        .section {
+            padding: 100px 7%;
+        }
+
+
+        .section-title {
+            text-align: center;
+
+            max-width: 750px;
+
+            margin: auto;
+
+            margin-bottom: 55px;
+        }
+
+
+        .section-title h2 {
+            font-size: 42px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .section-title h2 span {
+            color: #38bdf8;
+        }
+
+
+        .section-title p {
+            color: #94a3b8;
+
+            line-height: 1.7;
+        }
+
+
+        /* ================= FEATURES ================= */
+
+        .features {
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 20px;
+
+            max-width: 1200px;
+
+            margin: auto;
+        }
+
+
+        .feature-card {
+            padding: 30px;
+
+            background: linear-gradient(
+                145deg,
+                #0f172a,
+                #020617
+            );
+
+            border: 1px solid #1e293b;
+
+            border-radius: 15px;
+
+            transition: 0.3s;
+
+            position: relative;
+
+            overflow: hidden;
+        }
+
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+
+            border-color: #2563eb;
+
+            box-shadow: 0 15px 40px rgba(37,99,235,0.15);
+        }
+
+
+        .feature-icon {
+            width: 55px;
+            height: 55px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(37,99,235,0.15);
+
+            border-radius: 12px;
+
+            font-size: 27px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .feature-card h3 {
+            margin-bottom: 12px;
+        }
+
+
+        .feature-card p {
+            color: #94a3b8;
+
+            line-height: 1.6;
+
+            font-size: 14px;
+        }
+
+
+        /* ================= DETECTION DEMO ================= */
+
+        .demo-section {
+            background: #030b1c;
+        }
+
+
+        .demo {
+            max-width: 1100px;
+
+            margin: auto;
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 40px;
+
+            align-items: center;
+        }
+
+
+        .demo-image {
+            height: 360px;
+
+            border-radius: 18px;
+
+            border: 1px solid #1e293b;
+
+            background:
+                linear-gradient(
+                    rgba(2,6,23,0.45),
+                    rgba(2,6,23,0.7)
+                ),
+                radial-gradient(
+                    circle,
+                    #1d4ed8,
+                    #020617 60%
+                );
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            position: relative;
+
+            overflow: hidden;
+        }
+
+
+        .target {
+            width: 180px;
+            height: 120px;
+
+            border: 2px solid #22d3ee;
+
+            position: relative;
+
+            box-shadow: 0 0 25px rgba(34,211,238,0.3);
+        }
+
+
+        .target::before {
+            content: "Flying Object";
+
+            position: absolute;
+
+            top: -28px;
+            left: 0;
+
+            background: #22d3ee;
+
+            color: #020617;
+
+            padding: 5px 10px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+        }
+
+
+        .demo-content h2 {
+            font-size: 38px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .demo-content h2 span {
+            color: #38bdf8;
+        }
+
+
+        .demo-content p {
+            color: #94a3b8;
+
+            line-height: 1.8;
+
+            margin-bottom: 25px;
+        }
+
+
+        .check-list {
+            list-style: none;
+        }
+
+
+        .check-list li {
+            margin: 15px 0;
+
+            color: #cbd5e1;
+        }
+
+
+        .check-list li::before {
+            content: "✓";
+
+            color: #22c55e;
+
+            margin-right: 10px;
+
+            font-weight: bold;
+        }
+
+
+        /* ================= WORKFLOW ================= */
+
+        .workflow {
+            display: grid;
+
+            grid-template-columns: repeat(4, 1fr);
+
+            max-width: 1100px;
+
+            margin: auto;
+
+            gap: 20px;
+        }
+
+
+        .step {
+            text-align: center;
+
+            padding: 25px;
+
+            background: #0f172a;
+
+            border-radius: 12px;
+
+            border: 1px solid #1e293b;
+        }
+
+
+        .step-number {
+            width: 45px;
+            height: 45px;
+
+            margin: auto auto 15px;
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            border-radius: 50%;
+
+            background: #2563eb;
+
+            font-weight: bold;
+        }
+
+
+        .step p {
+            color: #94a3b8;
+
+            font-size: 14px;
+
+            margin-top: 8px;
+
+            line-height: 1.5;
+        }
+
+
+        /* ================= CTA ================= */
+
+        .cta {
+            margin: 50px auto;
+
+            max-width: 1100px;
+
+            padding: 70px 30px;
+
+            text-align: center;
+
+            border-radius: 20px;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    rgba(37,99,235,0.35),
+                    transparent 65%
+                );
+
+            border: 1px solid #1e3a8a;
+        }
+
+
+        .cta h2 {
+            font-size: 40px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .cta p {
+            color: #94a3b8;
+
+            margin-bottom: 30px;
+        }
+
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            padding: 35px 7%;
+
+            border-top: 1px solid #1e293b;
+
+            text-align: center;
+
+            color: #64748b;
+
+            font-size: 14px;
+        }
+
+
+        footer strong {
+            color: #38bdf8;
+        }
+
+
+        /* ================= RESPONSIVE ================= */
+
+        @media(max-width: 900px) {
+
+            .features {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .demo {
+                grid-template-columns: 1fr;
+            }
+
+            .workflow {
+                grid-template-columns: 1fr 1fr;
+            }
+
+        }
+
+
+        @media(max-width: 600px) {
+
+            nav {
+                padding: 0 20px;
+            }
+
+            .nav-links {
+                gap: 10px;
+            }
+
+            .nav-links a:not(.nav-button) {
+                display: none;
+            }
+
+            .stats,
+            .features,
+            .workflow {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 70px 20px;
+            }
+
+            .section-title h2 {
+                font-size: 32px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav>
+
+    <div class="logo">
+        🚀 SkyWatch <span>YOLO</span>
+    </div>
+
+    <div class="nav-links">
+
+        <a href="#home">Home</a>
+
+        <a href="#features">Features</a>
+
+        <a href="#technology">Technology</a>
+
+        <a href="/login/">Login</a>
+
+        <a class="nav-button" href="/register/">
+            Get Started
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- ================= HERO ================= -->
+
+<section class="hero" id="home">
+
+    <div class="grid-background"></div>
+
+    <div class="hero-content">
+
+        <div class="status">
+
+            <span class="status-dot"></span>
+
+            AI Detection System Online
+
+        </div>
+
+
+        <h1>
+
+            See The Sky
+
+            <br>
+
+            <span>With Intelligence.</span>
+
+        </h1>
+
+
+        <p class="hero-description">
+
+            SkyWatch YOLO is a real-time deep learning
+            framework for automated identification and
+            localization of flying objects using
+            advanced computer vision technology.
+
+        </p>
+
+
+        <div class="hero-buttons">
+
+            <a href="/register/" class="btn primary-btn">
+                🚀 Start Detection
+            </a>
+
+            <a href="#technology" class="btn secondary-btn">
+                Explore Technology →
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= STATS ================= -->
+
+<div class="stats">
+
+    <div class="stat">
+
+        <h2>YOLO</h2>
+
+        <p>Detection Framework</p>
+
+    </div>
+
+
+    <div class="stat">
+
+        <h2>AI</h2>
+
+        <p>Deep Learning</p>
+
+    </div>
+
+
+    <div class="stat">
+
+        <h2>Real-Time</h2>
+
+        <p>Object Detection</p>
+
+    </div>
+
+
+    <div class="stat">
+
+        <h2>24/7</h2>
+
+        <p>System Availability</p>
+
+    </div>
+
+</div>
+
+
+<!-- ================= FEATURES ================= -->
+
+<section class="section" id="features">
+
+    <div class="section-title">
+
+        <h2>
+            Powerful <span>AI Features</span>
+        </h2>
+
+        <p>
+            SkyWatch YOLO combines computer vision,
+            deep learning and real-time processing
+            to create an intelligent object detection
+            platform.
+        </p>
+
+    </div>
+
+
+    <div class="features">
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                🎯
+            </div>
+
+            <h3>
+                Object Detection
+            </h3>
+
+            <p>
+                Automatically identify and locate
+                objects from images and video streams
+                using YOLO-based detection.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                ⚡
+            </div>
+
+            <h3>
+                Real-Time Processing
+            </h3>
+
+            <p>
+                Process visual information quickly
+                for responsive and efficient
+                object detection.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                🧠
+            </div>
+
+            <h3>
+                Deep Learning
+            </h3>
+
+            <p>
+                Uses modern neural-network techniques
+                to analyze visual information.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                📷
+            </div>
+
+            <h3>
+                Image Analysis
+            </h3>
+
+            <p>
+                Upload visual data and analyze it
+                through the intelligent detection
+                pipeline.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                📍
+            </div>
+
+            <h3>
+                Object Localization
+            </h3>
+
+            <p>
+                Locate detected objects using
+                bounding-box based visual analysis.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-icon">
+                📊
+            </div>
+
+            <h3>
+                Detection Results
+            </h3>
+
+            <p>
+                View detection information and
+                results through an easy-to-use
+                dashboard.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= DEMO ================= -->
+
+<section class="section demo-section">
+
+    <div class="demo">
+
+
+        <div class="demo-image">
+
+            <div class="target"></div>
+
+        </div>
+
+
+        <div class="demo-content">
+
+            <h2>
+                Intelligent
+                <span>Visual Analysis</span>
+            </h2>
+
+            <p>
+
+                The system analyzes visual input and
+                identifies objects using a deep-learning
+                detection pipeline.
+
+            </p>
+
+
+            <ul class="check-list">
+
+                <li>
+                    Image-based object detection
+                </li>
+
+                <li>
+                    Bounding-box localization
+                </li>
+
+                <li>
+                    AI-powered visual analysis
+                </li>
+
+                <li>
+                    Real-time processing support
+                </li>
+
+                <li>
+                    Easy-to-use web interface
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= TECHNOLOGY ================= -->
+
+<section class="section" id="technology">
+
+    <div class="section-title">
+
+        <h2>
+            How <span>SkyWatch YOLO</span> Works
+        </h2>
+
+        <p>
+            A simple workflow transforms visual input
+            into intelligent detection results.
+        </p>
+
+    </div>
+
+
+    <div class="workflow">
+
+
+        <div class="step">
+
+            <div class="step-number">
+                01
+            </div>
+
+            <h3>
+                Input
+            </h3>
+
+            <p>
+                Upload an image or provide visual
+                input to the system.
+            </p>
+
+        </div>
+
+
+        <div class="step">
+
+            <div class="step-number">
+                02
+            </div>
+
+            <h3>
+                Processing
+            </h3>
+
+            <p>
+                The YOLO-based model analyzes
+                the visual information.
+            </p>
+
+        </div>
+
+
+        <div class="step">
+
+            <div class="step-number">
+                03
+            </div>
+
+            <h3>
+                Detection
+            </h3>
+
+            <p>
+                Objects are identified and localized
+                using bounding boxes.
+            </p>
+
+        </div>
+
+
+        <div class="step">
+
+            <div class="step-number">
+                04
+            </div>
+
+            <h3>
+                Results
+            </h3>
+
+            <p>
+                Detection results are displayed
+                through the web interface.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= CTA ================= -->
+
+<section class="section">
+
+    <div class="cta">
+
+        <h2>
+            Ready to Explore AI Vision?
+        </h2>
+
+        <p>
+            Create your account and access the
+            SkyWatch YOLO platform.
+        </p>
+
+        <a href="/register/" class="btn primary-btn">
+            🚀 Create Account
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    © 2026
+
+    <strong>SkyWatch YOLO</strong>
+
+    | AI-Powered Object Detection System
+
+</footer>
+
+
+</body>
+
+</html>
+```
